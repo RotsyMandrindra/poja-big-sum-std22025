@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: poja-big-sum-std22030 - Computation and API
+Description: poja-big-sum-std22025 - Computation and API
 
 Globals:
   Function:
@@ -13,16 +13,16 @@ Globals:
     
     VpcConfig:
       SecurityGroupIds:
-        - !Sub '{{resolve:ssm:/poja-big-sum-std22030/sg/id}}'
+        - !Sub '{{resolve:ssm:/poja-big-sum-std22025/sg/id}}'
       SubnetIds:
-        - !Sub '{{resolve:ssm:/poja-big-sum-std22030/subnet/public1/id}}'
-        - !Sub '{{resolve:ssm:/poja-big-sum-std22030/subnet/public2/id}}'
+        - !Sub '{{resolve:ssm:/poja-big-sum-std22025/subnet/public1/id}}'
+        - !Sub '{{resolve:ssm:/poja-big-sum-std22025/subnet/public2/id}}'
     Environment:
       Variables:
         ENV: !Ref Env
-        AWS_SQS_QUEUE_URL: !Sub '{{resolve:ssm:/poja-big-sum-std22030/${Env}/sqs/mailbox-queue-url}}'
-        AWS_EVENTBRIDGE_BUS: !Sub '{{resolve:ssm:/poja-big-sum-std22030/${Env}/eventbridge/bus-name}}'
-        AWS_S3_BUCKET: !Sub '{{resolve:ssm:/poja-big-sum-std22030/${Env}/s3/bucket-name}}'
+        AWS_SQS_QUEUE_URL: !Sub '{{resolve:ssm:/poja-big-sum-std22025/${Env}/sqs/mailbox-queue-url}}'
+        AWS_EVENTBRIDGE_BUS: !Sub '{{resolve:ssm:/poja-big-sum-std22025/${Env}/eventbridge/bus-name}}'
+        AWS_S3_BUCKET: !Sub '{{resolve:ssm:/poja-big-sum-std22025/${Env}/s3/bucket-name}}'
         AWS_SES_SOURCE: noreply@nowhere.com
         DRIVERCLASSNAME: org.sqlite.JDBC
         SPRING_JPA_DATABASEPLATFORM: com.poja.bigsum.repository.conf.SqliteDialect
@@ -43,9 +43,9 @@ Resources:
     Properties:
       Handler: com.poja.bigsum.ApiEventHandler::handleRequest
       MemorySize: 2048
-      Role: !Sub '{{resolve:ssm:/poja-big-sum-std22030/${Env}/execution/role-arn}}'
+      Role: !Sub '{{resolve:ssm:/poja-big-sum-std22025/${Env}/execution/role-arn}}'
       FileSystemConfigs:
-        - Arn: !Sub '{{resolve:ssm:/poja-big-sum-std22030/${Env}/efs/access-point/arn}}'
+        - Arn: !Sub '{{resolve:ssm:/poja-big-sum-std22025/${Env}/efs/access-point/arn}}'
           LocalMountPath: /mnt/efs
       Events:
         ApiCall:
@@ -59,15 +59,15 @@ Resources:
     Properties:
       Handler: com.poja.bigsum.MailboxEventHandler::handleRequest
       MemorySize: 1024
-      Role: !Sub '{{resolve:ssm:/poja-big-sum-std22030/${Env}/execution/role-arn}}'
+      Role: !Sub '{{resolve:ssm:/poja-big-sum-std22025/${Env}/execution/role-arn}}'
       FileSystemConfigs:
-        - Arn: !Sub '{{resolve:ssm:/poja-big-sum-std22030/${Env}/efs/access-point/arn}}'
+        - Arn: !Sub '{{resolve:ssm:/poja-big-sum-std22025/${Env}/efs/access-point/arn}}'
           LocalMountPath: /mnt/efs
       Events:
         AllEvents:
           Type: SQS
           Properties:
-            Queue: !Sub '{{resolve:ssm:/poja-big-sum-std22030/${Env}/sqs/mailbox-queue-arn}}'
+            Queue: !Sub '{{resolve:ssm:/poja-big-sum-std22025/${Env}/sqs/mailbox-queue-arn}}'
             BatchSize: 5
 
   ApplicationResourceGroup:
@@ -86,7 +86,7 @@ Resources:
   ApiUrlSSM:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Join [ '', [ /poja-big-sum-std22030/, !Ref Env, /api/url ] ]
+      Name: !Join [ '', [ /poja-big-sum-std22025/, !Ref Env, /api/url ] ]
       Type: String
       Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
 
